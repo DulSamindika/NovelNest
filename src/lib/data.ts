@@ -93,117 +93,148 @@ export const getUserById = (userId: string): User | null => {
     return allUsers.find(user => user.uid === userId) || null;
 }
 
-export const mockBooks: Book[] = [
+const booksData: Omit<Book, 'seller'>[] = [
   {
     id: '1',
     title: 'The Midnight Library',
     author: 'Matt Haig',
     genre: 'Fantasy',
-    description: "A novel about a library that contains an infinite number of books, each one the story of another reality.",
+    description: "Nora Seed finds herself in a library between life and death, with the chance to experience different versions of her life. This novel explores the choices we make, the regrets that haunt us, and the infinite possibilities that lie in every moment. A captivating story about what it means to live a fulfilling life.",
     condition: 'used-good',
     originalPrice: 26.0,
     sellingPrice: 13.5,
     sellerId: 'user-456',
     sellerName: 'John Smith',
     sellerContact: '555-1234',
-    bookImageUrl: 'https://picsum.photos/seed/book1/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book1/400/600',
+        'https://picsum.photos/seed/book1-2/400/600',
+        'https://picsum.photos/seed/book1-3/400/600',
+    ],
   },
   {
     id: '2',
     title: 'Project Hail Mary',
     author: 'Andy Weir',
     genre: 'Sci-Fi',
-    description: "A lone astronaut must save the earth from a disaster in this thrilling sci-fi adventure.",
+    description: "Ryland Grace is the sole survivor on a desperate, last-chance mission—and if he fails, humanity and the earth itself will perish. Except that right now, he doesn't know that. He can't even remember his own name, let alone the nature of his assignment or how to complete it. An unforgettable journey into space with a truly relatable hero.",
     condition: 'new',
     originalPrice: 28.0,
     sellingPrice: 20.0,
     sellerId: 'user-789',
     sellerName: 'Emily Jones',
     sellerContact: 'emily@email.com',
-    bookImageUrl: 'https://picsum.photos/seed/book2/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book2/400/600',
+        'https://picsum.photos/seed/book2-2/400/600',
+    ],
   },
   {
     id: '3',
     title: 'Klara and the Sun',
     author: 'Kazuo Ishiguro',
     genre: 'Sci-Fi',
-    description: "A story about Klara, an Artificial Friend with outstanding observational qualities, who watches the behavior of those who come in to browse.",
+    description: "From her place in the store, Klara, an Artificial Friend with outstanding observational qualities, watches carefully the behavior of those who come in to browse, and of those who pass on the street outside. She remains hopeful that a customer will soon choose her, but when the possibility emerges that her circumstances may change forever, Klara is warned not to invest too much in the promises of humans.",
     condition: 'used-fair',
     originalPrice: 20.0,
     sellingPrice: 8.0,
     sellerId: 'user-101',
     sellerName: 'Michael Brown',
     sellerContact: 'Call 555-5678',
-    bookImageUrl: 'https://picsum.photos/seed/book3/400/600',
+    bookImageUrls: ['https://picsum.photos/seed/book3/400/600'],
   },
   {
     id: '4',
     title: 'The Four Winds',
     author: 'Kristin Hannah',
     genre: 'Historical Fiction',
-    description: "An epic novel of love and heroism and hope, set during the Great Depression, a time when the country was in crisis and at war with itself.",
+    description: "Texas, 1934. Millions are out of work and a drought has broken the Great Plains. Farmers are fighting to keep their land and their livelihoods as the crops are failing, the water is drying up, and dust threatens to bury them all. One of the most defining periods of American history, brought to life with Kristin Hannah's rich, dimensional characters.",
     condition: 'used-good',
     originalPrice: 30.0,
     sellingPrice: 15.0,
     sellerId: 'user-456',
     sellerName: 'John Smith',
     sellerContact: '555-1234',
-    bookImageUrl: 'https://picsum.photos/seed/book4/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book4/400/600',
+        'https://picsum.photos/seed/book4-2/400/600',
+    ],
   },
   {
     id: '5',
     title: 'Circe',
     author: 'Madeline Miller',
     genre: 'Fantasy',
-    description: 'A thrilling, feminist retelling of the Greek myth of Circe, the goddess of magic.',
+    description: "In the house of Helios, god of the sun and mightiest of the Titans, a daughter is born. But Circe is a strange child--not powerful, like her father, nor viciously alluring like her mother. Turning to the world of mortals for companionship, she discovers that she does possess power--the power of witchcraft, which can transform rivals into monsters and menace the gods themselves.",
     condition: 'new',
     originalPrice: 16.99,
     sellingPrice: 12.0,
     sellerId: 'user-112',
     sellerName: 'Sarah Davis',
     sellerContact: 'sarah.d@web.com',
-    bookImageUrl: 'https://picsum.photos/seed/book5/400/600',
+    bookImageUrls: ['https://picsum.photos/seed/book5/400/600'],
   },
   {
     id: '6',
     title: 'Educated: A Memoir',
     author: 'Tara Westover',
     genre: 'Biography',
-    description: 'An unforgettable memoir about a young girl who, kept out of school, leaves her survivalist family and goes on to earn a PhD from Cambridge University.',
+    description: 'An unforgettable memoir about a young girl who, kept out of school, leaves her survivalist family and goes on to earn a PhD from Cambridge University. Her quest for knowledge transforms her, taking her over oceans and across continents, to Harvard and to Cambridge. Only then would she wonder if she’d traveled too far, if there was still a way home.',
     condition: 'used-good',
     originalPrice: 28.00,
     sellingPrice: 10.0,
     sellerId: 'user-789',
     sellerName: 'Emily Jones',
     sellerContact: 'emily@email.com',
-    bookImageUrl: 'https://picsum.photos/seed/book6/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book6/400/600',
+        'https://picsum.photos/seed/book6-2/400/600',
+    ],
   },
   {
     id: '7',
     title: 'Dune',
     author: 'Frank Herbert',
     genre: 'Sci-Fi',
-    description: "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides, who would become the mysterious man known as Muad'Dib.",
+    description: "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides, heir to a noble family tasked with ruling an inhospitable world where the only thing of value is the 'spice' melange, a drug capable of extending life and enhancing consciousness. A stunning blend of adventure and mysticism, environmentalism and politics.",
     condition: 'used-fair',
     originalPrice: 18.00,
     sellingPrice: 7.50,
     sellerId: 'user-123',
     sellerName: 'Jane Doe',
     sellerContact: '+11234567890',
-    bookImageUrl: 'https://picsum.photos/seed/book7/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book7/400/600',
+    ],
   },
   {
     id: '8',
     title: 'Atomic Habits',
     author: 'James Clear',
     genre: 'Self-Help',
-    description: 'An easy and proven way to build good habits and break bad ones.',
+    description: "No matter your goals, Atomic Habits offers a proven framework for improving--every day. James Clear, one of the world's leading experts on habit formation, reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.",
     condition: 'new',
     originalPrice: 27.00,
     sellingPrice: 18.00,
     sellerId: 'user-123',
     sellerName: 'Jane Doe',
     sellerContact: '+11234567890',
-    bookImageUrl: 'https://picsum.photos/seed/book8/400/600',
+    bookImageUrls: [
+        'https://picsum.photos/seed/book8/400/600',
+        'https://picsum.photos/seed/book8-2/400/600',
+        'https://picsum.photos/seed/book8-3/400/600',
+    ],
   },
 ];
+
+export const mockBooks: Book[] = booksData.map(book => {
+    const seller = getUserById(book.sellerId);
+    if (!seller) {
+        throw new Error(`Seller with id ${book.sellerId} not found for book ${book.title}`);
+    }
+    return { ...book, seller };
+});
+
+export const getBookById = (bookId: string): Book | null => {
+    return mockBooks.find(book => book.id === bookId) || null;
+}

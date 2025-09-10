@@ -33,6 +33,7 @@ export type Book = {
   sellerId: string;
   sellerName: string;
   sellerContact: string;
-  bookImageUrl: string;
+  bookImageUrls: string[];
   isFavorite?: boolean;
+  seller: User;
 };

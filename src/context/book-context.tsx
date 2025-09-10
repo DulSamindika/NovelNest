@@ -2,12 +2,12 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { Book } from '@/lib/types';
+import type { Book, User } from '@/lib/types';
 import { mockBooks, getLoggedInUser } from '@/lib/data';
 
 type BookContextType = {
   books: Book[];
-  addBook: (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
+  addBook: (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'seller'>) => void;
   toggleFavorite: (bookId: string) => void;
 };
 
@@ -16,10 +16,9 @@ const BookContext = createContext<BookContextType | undefined>(undefined);
 export function BookProvider({ children }: { children: ReactNode }) {
   const [books, setBooks] = useState<Book[]>(mockBooks);
 
-  const addBook = (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => {
+  const addBook = (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'seller'>) => {
     const loggedInUser = getLoggedInUser();
     if (!loggedInUser) {
-        // In a real app, you might want to redirect to login or show an error
         console.error("No user logged in to add a book.");
         return;
     }
@@ -29,6 +28,7 @@ export function BookProvider({ children }: { children: ReactNode }) {
       id: (books.length + 1).toString(),
       sellerId: loggedInUser.uid,
       sellerName: `${loggedInUser.firstName} ${loggedInUser.lastName}`,
+      seller: loggedInUser,
     };
     setBooks(prevBooks => [bookToAdd, ...prevBooks]);
   };

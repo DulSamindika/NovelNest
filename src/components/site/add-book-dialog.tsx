@@ -15,13 +15,13 @@ import { useState } from 'react';
 import type { Book } from '@/lib/types';
 
 type AddBookDialogProps = {
-  addBook: (book: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
+  addBook: (book: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'seller'>) => void;
 };
 
 export default function AddBookDialog({ addBook }: AddBookDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const handleFormSubmit = (values: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'bookImageUrl'> & { bookImageUrl: string }) => {
+  const handleFormSubmit = (values: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'seller'>) => {
     addBook(values);
     setOpen(false);
   };

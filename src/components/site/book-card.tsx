@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import type { Book, BookCondition } from '@/lib/types';
 import {
   BookText,
-  Contact,
   Heart,
   FlaskConical,
   Swords,
@@ -55,48 +54,53 @@ export default function BookCard({ book, onToggleFavorite }: BookCardProps) {
 
   return (
     <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
-      <CardHeader className="p-0 relative">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 z-10 bg-background/70 rounded-full hover:bg-background"
-          onClick={() => onToggleFavorite(book.id)}
-        >
-          <Heart className={`h-5 w-5 ${book.isFavorite ? 'text-red-500 fill-current' : 'text-foreground/80'}`} />
-        </Button>
-        <div className="relative aspect-[2/3] w-full overflow-hidden">
-          <Image
-            src={book.bookImageUrl}
-            alt={book.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            data-ai-hint={dataAiHintMap[book.genre] || 'book cover'}
-          />
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-3 p-4">
-         <CardTitle className="font-headline text-lg leading-tight line-clamp-2">{book.title}</CardTitle>
-        <p className="text-sm text-muted-foreground -mt-2">{book.author}</p>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {GenreIcon}
-          <span>{book.genre}</span>
-        </div>
-        <Badge variant={conditionVariant[book.condition]}>{conditionText[book.condition]}</Badge>
-        <p className="text-sm text-foreground/80 line-clamp-3">{book.description}</p>
-      </CardContent>
-      <CardFooter className="flex flex-col items-start gap-4 bg-muted/50 p-4 mt-auto">
-        <div className="flex items-baseline gap-2">
-          <p className="text-2xl font-bold text-primary">${book.sellingPrice.toFixed(2)}</p>
-          <p className="text-sm text-muted-foreground line-through">${book.originalPrice.toFixed(2)}</p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <User className="h-4 w-4" />
-          <Link href={`/profile/${book.sellerId}`} className="hover:underline">
-            <span>{book.sellerName} | {book.sellerContact}</span>
-          </Link>
-        </div>
-      </CardFooter>
+       <Link href={`/book/${book.id}`} className="flex flex-col flex-grow">
+          <CardHeader className="p-0 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10 bg-background/70 rounded-full hover:bg-background"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleFavorite(book.id)
+              }}
+            >
+              <Heart className={`h-5 w-5 ${book.isFavorite ? 'text-red-500 fill-current' : 'text-foreground/80'}`} />
+            </Button>
+            <div className="relative aspect-[2/3] w-full overflow-hidden">
+              <Image
+                src={book.bookImageUrls[0]}
+                alt={book.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                data-ai-hint={dataAiHintMap[book.genre] || 'book cover'}
+              />
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow space-y-3 p-4">
+            <CardTitle className="font-headline text-lg leading-tight line-clamp-2">{book.title}</CardTitle>
+            <p className="text-sm text-muted-foreground -mt-2">{book.author}</p>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {GenreIcon}
+              <span>{book.genre}</span>
+            </div>
+            <Badge variant={conditionVariant[book.condition]}>{conditionText[book.condition]}</Badge>
+          </CardContent>
+          <CardFooter className="flex flex-col items-start gap-2 bg-muted/50 p-4 mt-auto">
+            <div className="flex items-baseline gap-2">
+              <p className="text-2xl font-bold text-primary">${book.sellingPrice.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground line-through">${book.originalPrice.toFixed(2)}</p>
+            </div>
+             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span className="hover:underline">
+                  {book.sellerName}
+                </span>
+             </div>
+          </CardFooter>
+      </Link>
     </Card>
   );
 }

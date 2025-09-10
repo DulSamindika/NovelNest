@@ -53,7 +53,7 @@ const formSchema = z.object({
 });
 
 type AddBookFormProps = {
-  onFormSubmit: (values: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
+  onFormSubmit: (values: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'seller'>) => void;
 };
 
 export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
@@ -136,7 +136,7 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
         originalPrice: values.originalPrice,
         sellingPrice: values.sellingPrice,
         sellerContact: values.sellerContact,
-        bookImageUrl: reader.result as string,
+        bookImageUrls: [reader.result as string],
       };
       
       onFormSubmit(bookData);
