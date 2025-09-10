@@ -1,21 +1,30 @@
+
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { mockUser, mockBooks } from '@/lib/data';
 import type { Book } from '@/lib/types';
-import { User, Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
-import BookCard from '@/components/site/book-card';
+import { Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
 import Header from '@/components/site/header';
 import { Separator } from '@/components/ui/separator';
 import BookList from '@/components/site/book-list';
 
 export default function ProfilePage() {
   const [user, setUser] = useState(mockUser);
-  const [books, setBooks] = useState(mockBooks.filter(book => book.sellerId === user.uid));
+  const [allBooks, setAllBooks] = useState<Book[]>(mockBooks);
 
+  const toggleFavorite = (bookId: string) => {
+    setAllBooks(prevBooks =>
+      prevBooks.map(book =>
+        book.id === bookId ? { ...book, isFavorite: !book.isFavorite } : book
+      )
+    );
+  };
+
+  const userBooks = allBooks.filter(book => book.sellerId === user.uid);
+  const favoriteBooks = allBooks.filter(book => book.isFavorite);
   const averageRating = (user.ratings.reduce((acc, r) => acc + r.rating, 0) / user.ratings.length).toFixed(1);
 
   return (
@@ -59,8 +68,15 @@ export default function ProfilePage() {
           </Card>
 
           <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Your Favorite Books</h2>
+            <BookList books={favoriteBooks} onToggleFavorite={toggleFavorite} />
+          </div>
+
+          <Separator className="my-8" />
+          
+          <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Your Books for Sale</h2>
-            <BookList books={books} />
+            <BookList books={userBooks} onToggleFavorite={toggleFavorite} />
           </div>
           
           <Separator className="my-8" />

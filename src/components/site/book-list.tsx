@@ -1,11 +1,13 @@
+
 import BookCard from './book-card';
 import type { Book } from '@/lib/types';
 
 type BookListProps = {
   books: Book[];
+  onToggleFavorite: (bookId: string) => void;
 };
 
-export default function BookList({ books }: BookListProps) {
+export default function BookList({ books, onToggleFavorite }: BookListProps) {
   if (books.length === 0) {
     return <p className="text-center text-muted-foreground">No books found.</p>;
   }
@@ -13,7 +15,7 @@ export default function BookList({ books }: BookListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {books.map((book) => (
-        <BookCard key={book.id} book={book} />
+        <BookCard key={book.id} book={book} onToggleFavorite={onToggleFavorite} />
       ))}
     </div>
   );

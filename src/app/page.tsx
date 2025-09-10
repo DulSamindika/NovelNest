@@ -1,3 +1,4 @@
+
 "use client";
 
 import BookList from '@/components/site/book-list';
@@ -20,6 +21,14 @@ export default function Home() {
       sellerName: 'Jane Doe', // Assuming the logged in user is the seller
     };
     setBooks(prevBooks => [bookToAdd, ...prevBooks]);
+  };
+
+  const toggleFavorite = (bookId: string) => {
+    setBooks(prevBooks =>
+      prevBooks.map(book =>
+        book.id === bookId ? { ...book, isFavorite: !book.isFavorite } : book
+      )
+    );
   };
 
   const filteredBooks = books.filter(book =>
@@ -47,7 +56,7 @@ export default function Home() {
               />
             </div>
           </div>
-          <BookList books={filteredBooks} />
+          <BookList books={filteredBooks} onToggleFavorite={toggleFavorite} />
         </div>
       </main>
     </div>

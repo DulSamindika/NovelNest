@@ -1,3 +1,4 @@
+
 export type User = {
   uid: string;
   firstName: string;
@@ -33,4 +34,5 @@ export type Book = {
   sellerName: string;
   sellerContact: string;
   bookImageUrl: string;
+  isFavorite?: boolean;
 };
