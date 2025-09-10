@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { User, Tag, Star } from 'lucide-react';
+import { User, Tag, Star, Phone } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -29,7 +29,8 @@ export default function BookDetailPage() {
 
   useEffect(() => {
     if (bookId) {
-      setBook(getBookById(bookId));
+      const fetchedBook = getBookById(bookId);
+      setBook(fetchedBook);
     }
   }, [bookId]);
 
@@ -117,7 +118,7 @@ export default function BookDetailPage() {
               </div>
 
               <Button size="lg" className="mt-auto">
-                <Contact className="mr-2" />
+                <Phone className="mr-2" />
                 Contact Seller ({book.sellerContact})
               </Button>
             </div>
