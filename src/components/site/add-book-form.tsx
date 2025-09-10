@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,8 +26,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { generateDescriptionAction } from '@/app/actions';
 import { useState } from 'react';
-import { Wand2, Loader2 } from 'lucide-react';
+import { Wand2, Loader2, Upload } from 'lucide-react';
 import type { Book } from '@/lib/types';
+import Image from 'next/image';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
@@ -36,7 +41,14 @@ const formSchema = z.object({
   originalPrice: z.coerce.number().positive('Price must be a positive number.'),
   sellingPrice: z.coerce.number().positive('Price must be a positive number.'),
   sellerContact: z.string().min(5, 'Contact info is required.'),
-  bookImageUrl: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
+  coverImage: z
+    .any()
+    .refine((files) => files?.length >= 1, "Cover image is required.")
+    .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+    .refine(
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+      ".jpg, .jpeg, .png and .webp files are accepted."
+    ),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
 });
 
@@ -47,6 +59,7 @@ type AddBookFormProps = {
 export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,11 +71,24 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
       originalPrice: 0,
       sellingPrice: 0,
       sellerContact: '',
-      bookImageUrl: '',
+      coverImage: undefined,
       description: '',
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
+  
   async function handleGenerateDescription() {
     const { title, author, genre } = form.getValues();
     if (!title || !author || !genre) {
@@ -96,17 +122,33 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
     }
   }
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast({
-      title: 'Book Listed!',
-      description: `"${values.title}" is now available for sale.`,
-    });
-    const bookData = {
-      ...values,
-      bookImageUrl: values.bookImageUrl || 'https://picsum.photos/seed/newbook/400/600',
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const file = values.coverImage[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      const bookData = {
+        title: values.title,
+        author: values.author,
+        genre: values.genre,
+        description: values.description,
+        condition: values.condition,
+        originalPrice: values.originalPrice,
+        sellingPrice: values.sellingPrice,
+        sellerContact: values.sellerContact,
+        bookImageUrl: reader.result as string,
+      };
+      
+      onFormSubmit(bookData);
+
+      toast({
+        title: 'Book Listed!',
+        description: `"${values.title}" is now available for sale.`,
+      });
+      
+      form.reset();
+      setImagePreview(null);
     };
-    onFormSubmit(bookData);
-    form.reset();
   }
 
   return (
@@ -263,14 +305,41 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
         
         <FormField
           control={form.control}
-          name="bookImageUrl"
+          name="coverImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Book Image URL</FormLabel>
+              <FormLabel>Book Cover Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/book.jpg" {...field} />
+                <div className="flex items-center gap-4">
+                  {imagePreview && (
+                    <div className="relative w-20 h-28 rounded-md overflow-hidden">
+                      <Image
+                        src={imagePreview}
+                        alt="Cover preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <Button type="button" asChild variant="outline">
+                    <label htmlFor="cover-upload" className="cursor-pointer">
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Image
+                      <Input
+                        id="cover-upload"
+                        type="file"
+                        className="sr-only"
+                        accept="image/png, image/jpeg, image/webp"
+                        onChange={(e) => {
+                          field.onChange(e.target.files);
+                          handleImageChange(e);
+                        }}
+                      />
+                    </label>
+                  </Button>
+                </div>
               </FormControl>
-              <FormDescription>Optional: A link to a photo of your book.</FormDescription>
+              <FormDescription>Upload a picture of your book's cover.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

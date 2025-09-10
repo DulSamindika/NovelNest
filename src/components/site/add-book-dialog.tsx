@@ -1,8 +1,10 @@
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -19,7 +21,7 @@ type AddBookDialogProps = {
 export default function AddBookDialog({ addBook }: AddBookDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const handleFormSubmit = (values: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => {
+  const handleFormSubmit = (values: Omit<Book, 'id' | 'sellerId' | 'sellerName' | 'bookImageUrl'> & { bookImageUrl: string }) => {
     addBook(values);
     setOpen(false);
   };
@@ -40,7 +42,9 @@ export default function AddBookDialog({ addBook }: AddBookDialogProps) {
             generator for a captivating description!
           </DialogDescription>
         </DialogHeader>
-        <AddBookForm onFormSubmit={handleFormSubmit} />
+        <div className="max-h-[70vh] overflow-y-auto pr-4">
+          <AddBookForm onFormSubmit={handleFormSubmit} />
+        </div>
       </DialogContent>
     </Dialog>
   );
