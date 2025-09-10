@@ -4,44 +4,26 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { mockUser, mockBooks } from '@/lib/data';
-import type { Book, User } from '@/lib/types';
-import { Mail, Phone, Home as HomeIcon, Star, Edit } from 'lucide-react';
+import { mockUser } from '@/lib/data';
+import type { User } from '@/lib/types';
+import { Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
 import Header from '@/components/site/header';
 import { Separator } from '@/components/ui/separator';
 import BookList from '@/components/site/book-list';
-import { Button } from '@/components/ui/button';
 import AddBookDialog from '@/components/site/add-book-dialog';
 import EditProfileDialog from '@/components/site/edit-profile-dialog';
+import { useBooks } from '@/context/book-context';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User>(mockUser);
-  const [allBooks, setAllBooks] = useState<Book[]>(mockBooks);
-
-  const toggleFavorite = (bookId: string) => {
-    setAllBooks(prevBooks =>
-      prevBooks.map(book =>
-        book.id === bookId ? { ...book, isFavorite: !book.isFavorite } : book
-      )
-    );
-  };
-
-  const addBook = (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => {
-    const bookToAdd: Book = {
-      ...newBook,
-      id: (allBooks.length + 1).toString(),
-      sellerId: user.uid,
-      sellerName: `${user.firstName} ${user.lastName}`,
-    };
-    setAllBooks(prevBooks => [bookToAdd, ...prevBooks]);
-  };
+  const { books, toggleFavorite, addBook } = useBooks();
 
   const handleProfileUpdate = (updatedUser: Partial<User>) => {
     setUser(prevUser => ({ ...prevUser, ...updatedUser }));
   };
 
-  const userBooks = allBooks.filter(book => book.sellerId === user.uid);
-  const favoriteBooks = allBooks.filter(book => book.isFavorite);
+  const userBooks = books.filter(book => book.sellerId === user.uid);
+  const favoriteBooks = books.filter(book => book.isFavorite);
   const averageRating = user.ratings.length > 0
     ? (user.ratings.reduce((acc, r) => acc + r.rating, 0) / user.ratings.length).toFixed(1)
     : 'N/A';
@@ -92,14 +74,22 @@ export default function ProfilePage() {
 
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Your Favorite Books</h2>
-            <BookList books={favoriteBooks} onToggleFavorite={toggleFavorite} />
+            {favoriteBooks.length > 0 ? (
+              <BookList books={favoriteBooks} onToggleFavorite={toggleFavorite} />
+            ) : (
+              <p className="text-muted-foreground">You haven't favorited any books yet.</p>
+            )}
           </div>
 
           <Separator className="my-8" />
           
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Your Books for Sale</h2>
-            <BookList books={userBooks} onToggleFavorite={toggleFavorite} />
+            {userBooks.length > 0 ? (
+              <BookList books={userBooks} onToggleFavorite={toggleFavorite} />
+            ) : (
+              <p className="text-muted-foreground">You haven't listed any books for sale yet.</p>
+            )}
           </div>
           
           <Separator className="my-8" />

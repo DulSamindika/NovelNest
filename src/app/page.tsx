@@ -3,23 +3,14 @@
 
 import BookList from '@/components/site/book-list';
 import Header from '@/components/site/header';
-import { mockBooks } from '@/lib/data';
-import type { Book } from '@/lib/types';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { useBooks } from '@/context/book-context';
 
 export default function Home() {
-  const [books, setBooks] = useState<Book[]>(mockBooks);
+  const { books, toggleFavorite } = useBooks();
   const [searchTerm, setSearchTerm] = useState('');
-
-  const toggleFavorite = (bookId: string) => {
-    setBooks(prevBooks =>
-      prevBooks.map(book =>
-        book.id === bookId ? { ...book, isFavorite: !book.isFavorite } : book
-      )
-    );
-  };
 
   const filteredBooks = books.filter(book =>
     book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
