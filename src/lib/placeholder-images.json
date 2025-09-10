@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-avatar",
+      "description": "User profile avatar",
+      "imageUrl": "https://picsum.photos/seed/user/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "book-1",
+      "description": "The Midnight Library book cover",
+      "imageUrl": "https://picsum.photos/seed/book1/400/600",
+      "imageHint": "library fantasy"
+    },
+    {
+      "id": "book-2",
+      "description": "Project Hail Mary book cover",
+      "imageUrl": "https://picsum.photos/seed/book2/400/600",
+      "imageHint": "space stars"
+    },
+    {
+      "id": "book-3",
+      "description": "Klara and the Sun book cover",
+      "imageUrl": "https://picsum.photos/seed/book3/400/600",
+      "imageHint": "sun robot"
+    },
+    {
+      "id": "book-4",
+      "description": "The Four Winds book cover",
+      "imageUrl": "https://picsum.photos/seed/book4/400/600",
+      "imageHint": "dust storm"
+    },
+    {
+      "id": "book-5",
+      "description": "Circe book cover",
+      "imageUrl": "https://picsum.photos/seed/book5/400/600",
+      "imageHint": "greek mythology"
+    },
+    {
+      "id": "book-6",
+      "description": "Educated: A Memoir book cover",
+      "imageUrl": "https://picsum.photos/seed/book6/400/600",
+      "imageHint": "mountain school"
+    },
+    {
+      "id": "book-7",
+      "description": "Dune book cover",
+      "imageUrl": "https://picsum.photos/seed/book7/400/600",
+      "imageHint": "desert planet"
+    },
+    {
+      "id": "book-8",
+      "description": "Atomic Habits book cover",
+      "imageUrl": "https://picsum.photos/seed/book8/400/600",
+      "imageHint": "gears abstract"
+    }
+  ]
 }
