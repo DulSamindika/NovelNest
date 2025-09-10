@@ -10,6 +10,7 @@ import { User, Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
 import BookCard from '@/components/site/book-card';
 import Header from '@/components/site/header';
 import { Separator } from '@/components/ui/separator';
+import BookList from '@/components/site/book-list';
 
 export default function ProfilePage() {
   const [user, setUser] = useState(mockUser);
