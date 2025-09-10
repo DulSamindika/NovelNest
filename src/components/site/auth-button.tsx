@@ -1,3 +1,4 @@
+
 import type { Dispatch, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { mockUser } from '@/lib/data';
 import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type AuthButtonProps = {
   isLoggedIn: boolean;
@@ -19,6 +21,13 @@ type AuthButtonProps = {
 };
 
 export default function AuthButton({ isLoggedIn, setIsLoggedIn }: AuthButtonProps) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    router.push('/');
+  };
+
   if (isLoggedIn) {
     return (
       <DropdownMenu>
@@ -52,7 +61,7 @@ export default function AuthButton({ isLoggedIn, setIsLoggedIn }: AuthButtonProp
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>
@@ -62,8 +71,13 @@ export default function AuthButton({ isLoggedIn, setIsLoggedIn }: AuthButtonProp
   }
 
   return (
-    <Button onClick={() => setIsLoggedIn(true)} variant="outline">
-      Login
-    </Button>
+    <div className="flex gap-2">
+      <Button onClick={() => router.push('/login')} variant="outline">
+        Login
+      </Button>
+      <Button onClick={() => router.push('/register')}>
+        Sign Up
+      </Button>
+    </div>
   );
 }

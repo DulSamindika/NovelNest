@@ -1,23 +1,28 @@
 
 "use client";
 
-import { BookOpen, User } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import AuthButton from './auth-button';
-import AddBookDialog from './add-book-dialog';
-import { useState } from 'react';
-import type { Book } from '@/lib/types';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
 
-type HeaderProps = {
-  addBook: (book: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
-};
 
-export default function Header({ addBook }: HeaderProps) {
+export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Simulate checking auth state on mount
+  useEffect(() => {
+    // This is a simple check. In a real app, you'd verify a token
+    // or check a global state management store.
+    if (pathname === '/profile' || pathname === '/my-books') {
+        setIsLoggedIn(true);
+    }
+  }, [pathname]);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -50,7 +55,6 @@ export default function Header({ addBook }: HeaderProps) {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          {isLoggedIn && <AddBookDialog addBook={addBook} />}
           <AuthButton isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         </div>
       </div>

@@ -13,16 +13,6 @@ export default function Home() {
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const addBook = (newBook: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => {
-    const bookToAdd: Book = {
-      ...newBook,
-      id: (books.length + 1).toString(),
-      sellerId: 'user-123', // Assuming the logged in user is the seller
-      sellerName: 'Jane Doe', // Assuming the logged in user is the seller
-    };
-    setBooks(prevBooks => [bookToAdd, ...prevBooks]);
-  };
-
   const toggleFavorite = (bookId: string) => {
     setBooks(prevBooks =>
       prevBooks.map(book =>
@@ -38,7 +28,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <Header addBook={addBook} />
+      <Header />
       <main className="flex-1 p-4 sm:p-6 md:p-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
