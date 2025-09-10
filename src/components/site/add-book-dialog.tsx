@@ -10,9 +10,19 @@ import {
 import { PlusCircle } from 'lucide-react';
 import { AddBookForm } from './add-book-form';
 import { useState } from 'react';
+import type { Book } from '@/lib/types';
 
-export default function AddBookDialog() {
+type AddBookDialogProps = {
+  addBook: (book: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
+};
+
+export default function AddBookDialog({ addBook }: AddBookDialogProps) {
   const [open, setOpen] = useState(false);
+
+  const handleFormSubmit = (values: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => {
+    addBook(values);
+    setOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -30,7 +40,7 @@ export default function AddBookDialog() {
             generator for a captivating description!
           </DialogDescription>
         </DialogHeader>
-        <AddBookForm onFormSubmit={() => setOpen(false)} />
+        <AddBookForm onFormSubmit={handleFormSubmit} />
       </DialogContent>
     </Dialog>
   );

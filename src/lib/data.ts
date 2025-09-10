@@ -4,9 +4,27 @@ export const mockUser: User = {
   uid: 'user-123',
   firstName: 'Jane',
   lastName: 'Doe',
+  username: 'janedoe',
   mobileNumber: '+11234567890',
   contactInfo: 'jane.doe@example.com',
+  address: '123 Bookworm Lane, Readington, BK 12345',
   profilePicUrl: 'https://picsum.photos/seed/user/100/100',
+  ratings: [
+    {
+      id: 'rating-1',
+      rating: 5,
+      feedback: 'Great seller! The book was in excellent condition.',
+      customerId: 'user-456',
+      customerName: 'John Smith',
+    },
+    {
+      id: 'rating-2',
+      rating: 4,
+      feedback: 'Fast shipping and friendly communication.',
+      customerId: 'user-789',
+      customerName: 'Emily Jones',
+    },
+  ],
 };
 
 export const mockBooks: Book[] = [
@@ -103,9 +121,9 @@ export const mockBooks: Book[] = [
     condition: 'used-fair',
     originalPrice: 18.00,
     sellingPrice: 7.50,
-    sellerId: 'user-101',
-    sellerName: 'Michael Brown',
-    sellerContact: 'Call 555-5678',
+    sellerId: 'user-123',
+    sellerName: 'Jane Doe',
+    sellerContact: '+11234567890',
     bookImageUrl: 'https://picsum.photos/seed/book7/400/600',
   },
   {
@@ -117,9 +135,9 @@ export const mockBooks: Book[] = [
     condition: 'new',
     originalPrice: 27.00,
     sellingPrice: 18.00,
-    sellerId: 'user-112',
-    sellerName: 'Sarah Davis',
-    sellerContact: 'sarah.d@web.com',
+    sellerId: 'user-123',
+    sellerName: 'Jane Doe',
+    sellerContact: '+11234567890',
     bookImageUrl: 'https://picsum.photos/seed/book8/400/600',
   },
 ];

@@ -4,8 +4,13 @@ import { BookOpen } from 'lucide-react';
 import AuthButton from './auth-button';
 import AddBookDialog from './add-book-dialog';
 import { useState } from 'react';
+import type { Book } from '@/lib/types';
 
-export default function Header() {
+type HeaderProps = {
+  addBook: (book: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
+};
+
+export default function Header({ addBook }: HeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
@@ -16,7 +21,7 @@ export default function Header() {
           <span className="font-bold text-lg font-headline">BiblioSwap</span>
         </div>
         <div className="flex items-center gap-4">
-          {isLoggedIn && <AddBookDialog />}
+          {isLoggedIn && <AddBookDialog addBook={addBook} />}
           <AuthButton isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         </div>
       </div>

@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { generateDescriptionAction } from '@/app/actions';
 import { useState } from 'react';
 import { Wand2, Loader2 } from 'lucide-react';
+import type { Book } from '@/lib/types';
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
@@ -40,7 +41,7 @@ const formSchema = z.object({
 });
 
 type AddBookFormProps = {
-  onFormSubmit: () => void;
+  onFormSubmit: (values: Omit<Book, 'id' | 'sellerId' | 'sellerName'>) => void;
 };
 
 export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
@@ -54,8 +55,8 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
       author: '',
       genre: '',
       condition: 'used-good',
-      originalPrice: 0,
-      sellingPrice: 0,
+      originalPrice: undefined,
+      sellingPrice: undefined,
       sellerContact: '',
       bookImageUrl: '',
       description: '',
@@ -96,12 +97,16 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     toast({
       title: 'Book Listed!',
       description: `"${values.title}" is now available for sale.`,
     });
-    onFormSubmit();
+    const bookData = {
+      ...values,
+      bookImageUrl: values.bookImageUrl || 'https://picsum.photos/seed/newbook/400/600',
+    };
+    onFormSubmit(bookData);
+    form.reset();
   }
 
   return (

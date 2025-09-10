@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { mockUser } from '@/lib/data';
 import { LogOut, User } from 'lucide-react';
+import Link from 'next/link';
 
 type AuthButtonProps = {
   isLoggedIn: boolean;
@@ -40,14 +41,16 @@ export default function AuthButton({ isLoggedIn, setIsLoggedIn }: AuthButtonProp
                 {mockUser.firstName} {mockUser.lastName}
               </p>
               <p className="text-xs leading-none text-muted-foreground">
-                {mockUser.mobileNumber}
+                {mockUser.contactInfo}
               </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+          <DropdownMenuItem asChild>
+            <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
             <LogOut className="mr-2 h-4 w-4" />
