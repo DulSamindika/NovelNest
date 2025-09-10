@@ -33,6 +33,24 @@ import Image from 'next/image';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+const fileSchema = z
+  .any()
+  .refine((files) => files?.length === 1, "Image is required.")
+  .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+  .refine(
+    (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+    ".jpg, .jpeg, .png and .webp files are accepted."
+  );
+
+const multiFileSchema = z
+  .any()
+  .refine((files) => files?.length >= 1, "At least one image is required.")
+  .refine((files) => Array.from(files).every((file: any) => file.size <= MAX_FILE_SIZE), `Max file size for each image is 5MB.`)
+  .refine(
+    (files) => Array.from(files).every((file: any) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
+    "Only .jpg, .jpeg, .png and .webp files are accepted."
+  );
+
 const formSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
   author: z.string().min(2, 'Author must be at least 2 characters.'),
@@ -41,14 +59,8 @@ const formSchema = z.object({
   originalPrice: z.coerce.number().positive('Price must be a positive number.'),
   sellingPrice: z.coerce.number().positive('Price must be a positive number.'),
   sellerContact: z.string().min(5, 'Contact info is required.'),
-  coverImage: z
-    .any()
-    .refine((files) => files?.length >= 1, "Cover image is required.")
-    .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    ),
+  coverImage: fileSchema,
+  otherImages: multiFileSchema,
   description: z.string().min(10, 'Description must be at least 10 characters.'),
 });
 
@@ -59,7 +71,8 @@ type AddBookFormProps = {
 export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [otherImagesPreview, setOtherImagesPreview] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,23 +85,43 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
       sellingPrice: 0,
       sellerContact: '',
       coverImage: undefined,
+      otherImages: undefined,
       description: '',
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setCoverPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreview(null);
+      setCoverPreview(null);
     }
   };
-  
+
+  const handleOtherImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const newPreviews: string[] = [];
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newPreviews.push(reader.result as string);
+          if (newPreviews.length === files.length) {
+            setOtherImagesPreview(newPreviews);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    } else {
+      setOtherImagesPreview([]);
+    }
+  };
+
   async function handleGenerateDescription() {
     const { title, author, genre } = form.getValues();
     if (!title || !author || !genre) {
@@ -122,34 +155,54 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const file = values.coverImage[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      const bookData = {
-        title: values.title,
-        author: values.author,
-        genre: values.genre,
-        description: values.description,
-        condition: values.condition,
-        originalPrice: values.originalPrice,
-        sellingPrice: values.sellingPrice,
-        sellerContact: values.sellerContact,
-        bookImageUrls: [reader.result as string],
-      };
-      
-      onFormSubmit(bookData);
-
-      toast({
-        title: 'Book Listed!',
-        description: `"${values.title}" is now available for sale.`,
-      });
-      
-      form.reset();
-      setImagePreview(null);
-    };
+  const convertFilesToDataUrls = (files: FileList): Promise<string[]> => {
+    const promises = Array.from(files).map(file => {
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    });
+    return Promise.all(promises);
   }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+        const coverImageUrl = await convertFilesToDataUrls(values.coverImage);
+        const otherImageUrls = await convertFilesToDataUrls(values.otherImages);
+
+        const bookData = {
+            title: values.title,
+            author: values.author,
+            genre: values.genre,
+            description: values.description,
+            condition: values.condition,
+            originalPrice: values.originalPrice,
+            sellingPrice: values.sellingPrice,
+            sellerContact: values.sellerContact,
+            bookImageUrls: [...coverImageUrl, ...otherImageUrls],
+        };
+
+        onFormSubmit(bookData);
+
+        toast({
+            title: 'Book Listed!',
+            description: `"${values.title}" is now available for sale.`,
+        });
+
+        form.reset();
+        setCoverPreview(null);
+        setOtherImagesPreview([]);
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Image Upload Failed',
+            description: 'There was an error processing your images. Please try again.',
+        });
+    }
+  }
+
 
   return (
     <Form {...form}>
@@ -308,13 +361,13 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
           name="coverImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Book Cover Image</FormLabel>
+              <FormLabel>Book Cover Image (Required)</FormLabel>
               <FormControl>
                 <div className="flex items-center gap-4">
-                  {imagePreview && (
+                  {coverPreview && (
                     <div className="relative w-20 h-28 rounded-md overflow-hidden">
                       <Image
-                        src={imagePreview}
+                        src={coverPreview}
                         alt="Cover preview"
                         fill
                         className="object-cover"
@@ -332,14 +385,61 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
                         accept="image/png, image/jpeg, image/webp"
                         onChange={(e) => {
                           field.onChange(e.target.files);
-                          handleImageChange(e);
+                          handleCoverImageChange(e);
                         }}
                       />
                     </label>
                   </Button>
                 </div>
               </FormControl>
-              <FormDescription>Upload a picture of your book's cover.</FormDescription>
+              <FormDescription>Upload a clear picture of your book's cover.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="otherImages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Images of Book's Condition (Required)</FormLabel>
+              <FormControl>
+                <div className="flex flex-col gap-4">
+                    <Button type="button" asChild variant="outline" className="w-fit">
+                        <label htmlFor="other-images-upload" className="cursor-pointer">
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Images
+                        <Input
+                            id="other-images-upload"
+                            type="file"
+                            multiple
+                            className="sr-only"
+                            accept="image/png, image/jpeg, image/webp"
+                            onChange={(e) => {
+                                field.onChange(e.target.files);
+                                handleOtherImagesChange(e);
+                            }}
+                        />
+                        </label>
+                    </Button>
+                    {otherImagesPreview.length > 0 && (
+                        <div className="flex items-center gap-4 flex-wrap">
+                            {otherImagesPreview.map((src, index) => (
+                                <div key={index} className="relative w-20 h-28 rounded-md overflow-hidden">
+                                <Image
+                                    src={src}
+                                    alt={`Condition preview ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+              </FormControl>
+              <FormDescription>Upload at least one picture showing the book's condition (e.g., spine, pages).</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -350,3 +450,5 @@ export function AddBookForm({ onFormSubmit }: AddBookFormProps) {
     </Form>
   );
 }
+
+    
