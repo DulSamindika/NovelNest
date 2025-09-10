@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { mockUser } from '@/lib/data';
-import type { User } from '@/lib/types';
+import type { User, Rating } from '@/lib/types';
 import { Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
 import Header from '@/components/site/header';
 import { Separator } from '@/components/ui/separator';
@@ -13,6 +13,7 @@ import BookList from '@/components/site/book-list';
 import AddBookDialog from '@/components/site/add-book-dialog';
 import EditProfileDialog from '@/components/site/edit-profile-dialog';
 import { useBooks } from '@/context/book-context';
+import RateSellerDialog from '@/components/site/rate-seller-dialog';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User>(mockUser);
@@ -20,6 +21,20 @@ export default function ProfilePage() {
 
   const handleProfileUpdate = (updatedUser: Partial<User>) => {
     setUser(prevUser => ({ ...prevUser, ...updatedUser }));
+  };
+  
+  const handleAddRating = (newRating: Omit<Rating, 'id' | 'customerId'>) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      ratings: [
+        { 
+          ...newRating, 
+          id: `rating-${Date.now()}`,
+          customerId: `customer-${Date.now()}` // Simulate a unique customer
+        }, 
+        ...prevUser.ratings
+      ],
+    }));
   };
 
   const userBooks = books.filter(book => book.sellerId === user.uid);
@@ -49,6 +64,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div className="flex gap-2 self-start sm:self-auto">
+                  <RateSellerDialog onAddRating={handleAddRating} sellerName={`${user.firstName} ${user.lastName}`} />
                   <EditProfileDialog user={user} onProfileUpdate={handleProfileUpdate} />
                   <AddBookDialog addBook={addBook} />
                 </div>

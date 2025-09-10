@@ -11,8 +11,10 @@ import {
   Swords,
   ScrollText,
   Sparkles,
+  User,
 } from 'lucide-react';
 import { Button } from '../ui/button';
+import Link from 'next/link';
 
 const genreIcons: { [key: string]: React.ReactNode } = {
   Fantasy: <Swords className="h-4 w-4" />,
@@ -89,8 +91,10 @@ export default function BookCard({ book, onToggleFavorite }: BookCardProps) {
           <p className="text-sm text-muted-foreground line-through">${book.originalPrice.toFixed(2)}</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Contact className="h-4 w-4" />
-          <span>{book.sellerName} | {book.sellerContact}</span>
+          <User className="h-4 w-4" />
+          <Link href={`/profile`} className="hover:underline">
+            <span>{book.sellerName} | {book.sellerContact}</span>
+          </Link>
         </div>
       </CardFooter>
     </Card>
