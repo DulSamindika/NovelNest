@@ -1,14 +1,13 @@
 
 "use client";
 
-import { BookOpen } from 'lucide-react';
 import AuthButton from './auth-button';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-
+import Logo from './logo';
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,8 +18,10 @@ export default function Header() {
   useEffect(() => {
     // This is a simple check. In a real app, you'd verify a token
     // or check a global state management store.
-    if (pathname === '/profile' || pathname === '/my-books') {
+    if (pathname.startsWith('/profile') || pathname === '/my-books') {
         setIsLoggedIn(true);
+    } else if (pathname === '/login' || pathname === '/register') {
+        setIsLoggedIn(false);
     }
   }, [pathname]);
 
@@ -34,8 +35,8 @@ export default function Header() {
       <div className="container flex h-14 max-w-7xl items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg font-headline">BiblioSwap</span>
+            <Logo className="h-7 w-7 text-primary" />
+            <span className="font-bold text-lg font-headline">NovelNest</span>
           </Link>
           <nav className="hidden md:flex items-center gap-4">
             {navLinks.map(link => 
