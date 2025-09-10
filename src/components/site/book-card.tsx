@@ -92,7 +92,7 @@ export default function BookCard({ book, onToggleFavorite }: BookCardProps) {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <User className="h-4 w-4" />
-          <Link href={`/profile`} className="hover:underline">
+          <Link href={`/profile/${book.sellerId}`} className="hover:underline">
             <span>{book.sellerName} | {book.sellerContact}</span>
           </Link>
         </div>

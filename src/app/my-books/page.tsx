@@ -1,15 +1,26 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/site/header';
 import BookList from '@/components/site/book-list';
-import { mockUser } from '@/lib/data';
+import { getLoggedInUser } from '@/lib/data';
+import type { User } from '@/lib/types';
 import { useBooks } from '@/context/book-context';
 
 export default function MyBooksPage() {
-  const [user] = useState(mockUser);
+  const [user, setUser] = useState<User | null>(null);
   const { books, toggleFavorite } = useBooks();
+
+  useEffect(() => {
+    setUser(getLoggedInUser());
+  }, []);
+
+  if (!user) {
+    // Optional: Render a loading state
+    return <div>Loading...</div>;
+  }
+  
   const userBooks = books.filter(book => book.sellerId === user.uid);
 
   return (

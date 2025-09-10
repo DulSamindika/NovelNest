@@ -1,31 +1,97 @@
+
 import type { Book, User } from '@/lib/types';
 
-export const mockUser: User = {
-  uid: 'user-123',
-  firstName: 'Jane',
-  lastName: 'Doe',
-  username: 'janedoe',
-  mobileNumber: '+11234567890',
-  contactInfo: 'jane.doe@example.com',
-  address: '123 Bookworm Lane, Readington, BK 12345',
-  profilePicUrl: 'https://picsum.photos/seed/user/100/100',
-  ratings: [
-    {
-      id: 'rating-1',
-      rating: 5,
-      feedback: 'Great seller! The book was in excellent condition.',
-      customerId: 'user-456',
-      customerName: 'John Smith',
-    },
-    {
-      id: 'rating-2',
-      rating: 4,
-      feedback: 'Fast shipping and friendly communication.',
-      customerId: 'user-789',
-      customerName: 'Emily Jones',
-    },
-  ],
-};
+// The currently logged-in user. In a real app, this would be determined by an auth session.
+const LOGGED_IN_USER_ID = 'user-123';
+
+const allUsers: User[] = [
+  {
+    uid: 'user-123',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    username: 'janedoe',
+    mobileNumber: '+11234567890',
+    contactInfo: 'jane.doe@example.com',
+    address: '123 Bookworm Lane, Readington, BK 12345',
+    profilePicUrl: 'https://picsum.photos/seed/user1/100/100',
+    ratings: [
+      {
+        id: 'rating-1',
+        rating: 5,
+        feedback: 'Great seller! The book was in excellent condition.',
+        customerId: 'user-456',
+        customerName: 'John Smith',
+      },
+      {
+        id: 'rating-2',
+        rating: 4,
+        feedback: 'Fast shipping and friendly communication.',
+        customerId: 'user-789',
+        customerName: 'Emily Jones',
+      },
+    ],
+  },
+  {
+    uid: 'user-456',
+    firstName: 'John',
+    lastName: 'Smith',
+    username: 'johnsmith',
+    mobileNumber: '+19876543210',
+    contactInfo: 'john.smith@example.com',
+    address: '456 Novel Avenue, Storyville, BK 67890',
+    profilePicUrl: 'https://picsum.photos/seed/user2/100/100',
+    ratings: [
+      {
+        id: 'rating-3',
+        rating: 5,
+        feedback: 'Book was exactly as described. A pleasure to buy from!',
+        customerId: 'user-123',
+        customerName: 'Jane Doe',
+      },
+    ],
+  },
+  {
+    uid: 'user-789',
+    firstName: 'Emily',
+    lastName: 'Jones',
+    username: 'emilyreads',
+    mobileNumber: '+15551239876',
+    contactInfo: 'emily.j@example.com',
+    address: '789 Chapter Street, Tale Town, BK 10112',
+    profilePicUrl: 'https://picsum.photos/seed/user3/100/100',
+    ratings: [],
+  },
+   {
+    uid: 'user-101',
+    firstName: 'Michael',
+    lastName: 'Brown',
+    username: 'mikeb',
+    mobileNumber: '+15558887777',
+    contactInfo: 'mbrown@email.com',
+    address: '101 Prose Place, Fable City, BK 13141',
+    profilePicUrl: 'https://picsum.photos/seed/user4/100/100',
+    ratings: [],
+  },
+  {
+    uid: 'user-112',
+    firstName: 'Sarah',
+    lastName: 'Davis',
+    username: 'sarahd',
+    mobileNumber: '+15552223333',
+    contactInfo: 'sarah.d@web.com',
+    address: '112 Verse Vista, Poem Peak, BK 15161',
+    profilePicUrl: 'https://picsum.photos/seed/user5/100/100',
+    ratings: [],
+  },
+];
+
+export const getLoggedInUser = (): User | null => {
+    return allUsers.find(user => user.uid === LOGGED_IN_USER_ID) || null;
+}
+
+export const getUserById = (userId: string): User | null => {
+    return allUsers.find(user => user.uid === userId) || null;
+}
 
 export const mockBooks: Book[] = [
   {
