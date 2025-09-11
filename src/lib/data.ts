@@ -2,7 +2,9 @@
 import type { Book, User } from '@/lib/types';
 
 // The currently logged-in user. In a real app, this would be determined by an auth session.
-const LOGGED_IN_USER_ID = 'user-123';
+let LOGGED_IN_USER_ID = 'user-123';
+// In-memory store for a newly registered user to simulate session persistence.
+let tempUser: User | null = null;
 
 const allUsers: User[] = [
   {
@@ -85,11 +87,36 @@ const allUsers: User[] = [
   },
 ];
 
+// --- Auth Simulation ---
+export function setLoggedInUser(user?: User) {
+    if (user) {
+        // This simulates creating a new user session
+        tempUser = user;
+        LOGGED_IN_USER_ID = user.uid;
+    } else {
+        // This simulates logging in as the default user
+        tempUser = null;
+        LOGGED_IN_USER_ID = 'user-123';
+    }
+}
+
+export function clearLoggedInUser() {
+    tempUser = null;
+    LOGGED_IN_USER_ID = 'user-123'; // Reset to default
+}
+// --- End Auth Simulation ---
+
 export const getLoggedInUser = (): User | null => {
+    if (tempUser && tempUser.uid === LOGGED_IN_USER_ID) {
+        return tempUser;
+    }
     return allUsers.find(user => user.uid === LOGGED_IN_USER_ID) || null;
 }
 
 export const getUserById = (userId: string): User | null => {
+    if (tempUser && tempUser.uid === userId) {
+        return tempUser;
+    }
     return allUsers.find(user => user.uid === userId) || null;
 }
 

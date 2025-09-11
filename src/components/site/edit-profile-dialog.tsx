@@ -25,6 +25,8 @@ type EditProfileDialogProps = {
 
 export default function EditProfileDialog({ user, onProfileUpdate }: EditProfileDialogProps) {
   const [open, setOpen] = useState(false);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
   const [username, setUsername] = useState(user.username);
   const [mobileNumber, setMobileNumber] = useState(user.mobileNumber);
   const [profilePicUrl, setProfilePicUrl] = useState(user.profilePicUrl);
@@ -42,6 +44,8 @@ export default function EditProfileDialog({ user, onProfileUpdate }: EditProfile
 
   const handleSaveChanges = () => {
     onProfileUpdate({
+      firstName,
+      lastName,
       username,
       mobileNumber,
       profilePicUrl,
@@ -77,6 +81,28 @@ export default function EditProfileDialog({ user, onProfileUpdate }: EditProfile
                     <Input id="profile-pic-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageChange} />
                 </label>
             </Button>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="firstName" className="text-right">
+              First Name
+            </Label>
+            <Input
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="lastName" className="text-right">
+              Last Name
+            </Label>
+            <Input
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="col-span-3"
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">

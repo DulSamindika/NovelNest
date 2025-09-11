@@ -27,8 +27,15 @@ export default function RegisterPage() {
     e.preventDefault();
     // In a real app, you'd handle user registration here.
     console.log('Registering user:', formData);
-    // After successful registration, navigate to the login page.
-    router.push('/login');
+    // After successful registration, navigate to the login page,
+    // passing the new user's data in the query params for simulation.
+    const query = new URLSearchParams({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email
+    }).toString();
+
+    router.push(`/login?${query}`);
   };
 
   return (
@@ -45,11 +52,11 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" placeholder="Max" required onChange={handleChange} />
+                <Input id="firstName" placeholder="Max" required onChange={handleChange} value={formData.firstName} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" placeholder="Robinson" required onChange={handleChange} />
+                <Input id="lastName" placeholder="Robinson" required onChange={handleChange} value={formData.lastName} />
               </div>
             </div>
             <div className="grid gap-2">
@@ -60,11 +67,12 @@ export default function RegisterPage() {
                 placeholder="m@example.com"
                 required
                 onChange={handleChange}
+                value={formData.email}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required onChange={handleChange} />
+              <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
             </div>
             <Button type="submit" className="w-full">
               Create an account
