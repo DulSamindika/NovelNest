@@ -12,7 +12,7 @@ export default function Banner() {
                 NovelNest
               </h1>
               <p className="mt-2 text-xl font-medium text-foreground/80">
-                Sell your old favorites
+                Discover hidden gems, sell your old favorites.
               </p>
             </div>
           </div>
