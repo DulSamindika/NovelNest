@@ -8,9 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { addUser, userExists } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -25,8 +28,24 @@ export default function RegisterPage() {
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd handle user registration here.
-    console.log('Registering user:', formData);
+    
+    // Check if user already exists
+    if (userExists(formData.email)) {
+        toast({
+            variant: 'destructive',
+            title: 'Registration Failed',
+            description: 'An account with this email already exists.',
+        });
+        return;
+    }
+
+    // Add the new user to our simulated database
+    addUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+    });
+
     // After successful registration, navigate to the login page,
     // passing the new user's data in the query params for simulation.
     const query = new URLSearchParams({

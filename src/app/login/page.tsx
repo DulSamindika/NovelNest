@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { setLoggedInUser, clearLoggedInUser } from '@/lib/data';
+import { setLoggedInUserByEmail, clearLoggedInUser, userExists } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,32 +30,27 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd handle authentication here.
-    console.log('Logging in with:', email, password);
-
-    // For demonstration, we'll simulate a successful login and redirect.
-    // If coming from registration, we'll create a temporary user object.
-    const firstName = searchParams.get('firstName');
-    const lastName = searchParams.get('lastName');
-
-    if (firstName && lastName) {
-        setLoggedInUser({
-            uid: `user-${Date.now()}`,
-            firstName,
-            lastName,
-            username: `${firstName.toLowerCase()}${lastName.toLowerCase()}`,
-            mobileNumber: 'Not provided',
-            contactInfo: email,
-            address: 'Not provided',
-            profilePicUrl: 'https://picsum.photos/seed/newuser/100/100', // Default pic
-            ratings: [],
-        });
-    } else {
-        // Log in with the default user if not coming from registration
-        setLoggedInUser(); 
-    }
     
-    router.push('/profile');
+    // In a real app, you'd handle authentication here.
+    // For this simulation, we'll check if the user exists.
+    if (userExists(email)) {
+      setLoggedInUserByEmail(email);
+      router.push('/profile');
+    } else {
+      // If not coming from a fresh registration, it's an unknown user.
+      if (!searchParams.get('firstName')) {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'No account found with that email. Please sign up.',
+        });
+      } else {
+        // This case handles the flow immediately after registration,
+        // where the user is guaranteed to exist from the previous step.
+        setLoggedInUserByEmail(email);
+        router.push('/profile');
+      }
+    }
   };
 
   return (

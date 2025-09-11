@@ -2,9 +2,7 @@
 import type { Book, User } from '@/lib/types';
 
 // The currently logged-in user. In a real app, this would be determined by an auth session.
-let LOGGED_IN_USER_ID = 'user-123';
-// In-memory store for a newly registered user to simulate session persistence.
-let tempUser: User | null = null;
+let LOGGED_IN_USER_ID: string | null = 'user-123';
 
 const allUsers: User[] = [
   {
@@ -88,35 +86,59 @@ const allUsers: User[] = [
 ];
 
 // --- Auth Simulation ---
+export function addUser(userData: { firstName: string, lastName: string, email: string }) {
+    const newUser: User = {
+        uid: `user-${Date.now()}`,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        username: `${userData.firstName.toLowerCase()}${userData.lastName.toLowerCase()}`,
+        contactInfo: userData.email,
+        mobileNumber: 'Not provided',
+        address: 'Not provided',
+        profilePicUrl: `https://picsum.photos/seed/${Date.now()}/100/100`, // Default pic
+        ratings: [],
+    };
+    allUsers.push(newUser);
+}
+
+export function userExists(email: string): boolean {
+    return allUsers.some(user => user.contactInfo === email);
+}
+
+export function setLoggedInUserByEmail(email: string) {
+    const user = allUsers.find(u => u.contactInfo === email);
+    if (user) {
+        LOGGED_IN_USER_ID = user.uid;
+    } else {
+        // Fallback to default user if email not found, though logic should prevent this.
+        LOGGED_IN_USER_ID = 'user-123';
+    }
+}
+
 export function setLoggedInUser(user?: User) {
     if (user) {
-        // This simulates creating a new user session
-        tempUser = user;
+        // This is now primarily for the old login flow which we're phasing out
+        if (!allUsers.find(u => u.uid === user.uid)) {
+            allUsers.push(user);
+        }
         LOGGED_IN_USER_ID = user.uid;
     } else {
         // This simulates logging in as the default user
-        tempUser = null;
         LOGGED_IN_USER_ID = 'user-123';
     }
 }
 
 export function clearLoggedInUser() {
-    tempUser = null;
-    LOGGED_IN_USER_ID = 'user-123'; // Reset to default
+    LOGGED_IN_USER_ID = null;
 }
 // --- End Auth Simulation ---
 
 export const getLoggedInUser = (): User | null => {
-    if (tempUser && tempUser.uid === LOGGED_IN_USER_ID) {
-        return tempUser;
-    }
+    if (!LOGGED_IN_USER_ID) return null;
     return allUsers.find(user => user.uid === LOGGED_IN_USER_ID) || null;
 }
 
 export const getUserById = (userId: string): User | null => {
-    if (tempUser && tempUser.uid === userId) {
-        return tempUser;
-    }
     return allUsers.find(user => user.uid === userId) || null;
 }
 
