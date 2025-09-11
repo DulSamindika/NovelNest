@@ -14,8 +14,8 @@ export default function Logo(props: SVGProps<SVGSVGElement>) {
       className={cn('h-6 w-6', props.className)}
       {...props}
     >
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      <path d="M22 20V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2zM9.4 16.6L8 18l-1.4-1.4c-1.3-1.3-1.3-3.5 0-4.8l2.8-2.8c1.3-1.3 3.5-1.3 4.8 0l1.4 1.4M9.4 7.4L8 6l-1.4 1.4c-1.3 1.3-1.3 3.5 0 4.8l2.8 2.8c1.3 1.3 3.5 1.3 4.8 0l1.4-1.4" />
+      <path d="M12 18V6" />
     </svg>
   );
 }
