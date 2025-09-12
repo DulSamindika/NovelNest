@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { verifyOtpAndRegisterUserAction } from '../ideamart-actions';
 import { Loader2 } from 'lucide-react';
+import Header from '@/components/site/header';
 
 export default function OtpVerificationPage() {
   const router = useRouter();
@@ -72,36 +73,39 @@ export default function OtpVerificationPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">OTP Verification</CardTitle>
-          <CardDescription>
-            Enter the 6-digit code sent to {userData.mobileNumber}.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleVerifyOtp} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="otp">Verification Code</Label>
-              <Input
-                id="otp"
-                type="text"
-                maxLength={6}
-                placeholder="123456"
-                required
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Verify Account
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex flex-1 items-center justify-center bg-muted/40 p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">OTP Verification</CardTitle>
+            <CardDescription>
+              Enter the 6-digit code sent to {userData.mobileNumber}.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleVerifyOtp} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="otp">Verification Code</Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  maxLength={6}
+                  placeholder="123456"
+                  required
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Verify Account
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }

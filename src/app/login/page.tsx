@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { setLoggedInUserByIdentifier, clearLoggedInUser, userExists } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
+import Header from '@/components/site/header';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,49 +55,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your mobile number below to login to your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="mobileNumber">Mobile Number</Label>
-              <Input
-                id="mobileNumber"
-                type="tel"
-                placeholder="+1234567890"
-                required
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-              />
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex flex-1 items-center justify-center bg-muted/40 p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
+              Enter your mobile number below to login to your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="mobileNumber">Mobile Number</Label>
+                <Input
+                  id="mobileNumber"
+                  type="tel"
+                  placeholder="+1234567890"
+                  required
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Sign in
+              </Button>
+            </form>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{' '}
+              <Link href="/register" className="underline">
+                Sign up
+              </Link>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Sign in
-            </Button>
-          </form>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="underline">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
