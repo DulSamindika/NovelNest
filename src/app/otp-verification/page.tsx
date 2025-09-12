@@ -8,62 +8,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { addUser } from '@/lib/data';
+import { verifyOtpAndRegisterUserAction } from '../ideamart-actions';
+import { Loader2 } from 'lucide-react';
 
 export default function OtpVerificationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [otp, setOtp] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState({
+    mobileNumber: '',
+    firstName: '',
+    lastName: '',
+  });
 
   useEffect(() => {
-    // Retrieve user data from query params
-    const mobileFromQuery = searchParams.get('mobileNumber');
-    const firstNameFromQuery = searchParams.get('firstName');
-    const lastNameFromQuery = searchParams.get('lastName');
-    if (mobileFromQuery && firstNameFromQuery && lastNameFromQuery) {
-      setMobileNumber(mobileFromQuery);
-      setFirstName(firstNameFromQuery);
-      setLastName(lastNameFromQuery);
+    const mobileNumber = searchParams.get('mobileNumber');
+    const firstName = searchParams.get('firstName');
+    const lastName = searchParams.get('lastName');
+
+    if (mobileNumber && firstName && lastName) {
+      setUserData({ mobileNumber, firstName, lastName });
     } else {
         // If data is missing, redirect back to register
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Registration details are missing. Please start over.',
+        });
         router.push('/register');
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, toast]);
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // For simulation, we'll accept any 6-digit code.
-    if (otp.length === 6 && /^\d{6}$/.test(otp)) {
-      
-      // Add the new user to our simulated database
-      addUser({
-          firstName: firstName,
-          lastName: lastName,
-          mobileNumber: mobileNumber,
+    const result = await verifyOtpAndRegisterUserAction(userData, otp);
+
+    if (result.success) {
+      toast({
+        title: 'Account Created!',
+        description: 'You can now log in with your mobile number.',
       });
 
       // After successful registration, navigate to the login page,
-      // passing the new user's data in the query params for simulation.
+      // passing the mobile number for convenience.
       const query = new URLSearchParams({
-          firstName: firstName,
-          lastName: lastName,
-          mobileNumber: mobileNumber,
+          mobileNumber: userData.mobileNumber,
       }).toString();
 
       router.push(`/login?${query}`);
-
     } else {
-      toast({
+       toast({
         variant: 'destructive',
-        title: 'Invalid OTP',
-        description: 'Please enter a valid 6-digit OTP.',
+        title: 'Verification Failed',
+        description: result.error || 'An unexpected error occurred.',
       });
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -72,7 +77,7 @@ export default function OtpVerificationPage() {
         <CardHeader>
           <CardTitle className="text-2xl">OTP Verification</CardTitle>
           <CardDescription>
-            Enter the 6-digit code sent to your mobile number.
+            Enter the 6-digit code sent to {userData.mobileNumber}.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -87,9 +92,11 @@ export default function OtpVerificationPage() {
                 required
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Verify Account
             </Button>
           </form>

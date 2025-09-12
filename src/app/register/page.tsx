@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { userExists } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
+import { sendOtpAction } from '../ideamart-actions';
+import { Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -26,28 +28,34 @@ export default function RegisterPage() {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check if user already exists
-    if (userExists(formData.mobileNumber)) {
+    setIsLoading(true);
+
+    const result = await sendOtpAction(formData.mobileNumber);
+
+    if (result.success) {
+        toast({
+            title: 'OTP Sent!',
+            description: 'A verification code has been sent to your mobile number.',
+        });
+
+        const query = new URLSearchParams({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            mobileNumber: formData.mobileNumber
+        }).toString();
+
+        router.push(`/otp-verification?${query}`);
+    } else {
         toast({
             variant: 'destructive',
             title: 'Registration Failed',
-            description: 'An account with this mobile number already exists.',
+            description: result.error || 'An unexpected error occurred.',
         });
-        return;
     }
 
-    // In a real app, you would now trigger sending an OTP.
-    // Here, we'll just redirect to the OTP page with the user's data.
-    const query = new URLSearchParams({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        mobileNumber: formData.mobileNumber
-    }).toString();
-
-    router.push(`/otp-verification?${query}`);
+    setIsLoading(false);
   };
 
   return (
@@ -64,11 +72,11 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" placeholder="Max" required onChange={handleChange} value={formData.firstName} />
+                <Input id="firstName" placeholder="Max" required onChange={handleChange} value={formData.firstName} disabled={isLoading} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" placeholder="Robinson" required onChange={handleChange} value={formData.lastName} />
+                <Input id="lastName" placeholder="Robinson" required onChange={handleChange} value={formData.lastName} disabled={isLoading} />
               </div>
             </div>
             <div className="grid gap-2">
@@ -80,13 +88,15 @@ export default function RegisterPage() {
                 required
                 onChange={handleChange}
                 value={formData.mobileNumber}
+                disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
+              <Input id="password" type="password" required onChange={handleChange} value={formData.password} disabled={isLoading} />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create an account
             </Button>
           </form>
