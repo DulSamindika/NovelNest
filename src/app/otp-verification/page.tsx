@@ -15,17 +15,17 @@ export default function OtpVerificationPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [otp, setOtp] = useState('');
-  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
   useEffect(() => {
     // Retrieve user data from query params
-    const emailFromQuery = searchParams.get('email');
+    const mobileFromQuery = searchParams.get('mobileNumber');
     const firstNameFromQuery = searchParams.get('firstName');
     const lastNameFromQuery = searchParams.get('lastName');
-    if (emailFromQuery && firstNameFromQuery && lastNameFromQuery) {
-      setEmail(emailFromQuery);
+    if (mobileFromQuery && firstNameFromQuery && lastNameFromQuery) {
+      setMobileNumber(mobileFromQuery);
       setFirstName(firstNameFromQuery);
       setLastName(lastNameFromQuery);
     } else {
@@ -44,7 +44,7 @@ export default function OtpVerificationPage() {
       addUser({
           firstName: firstName,
           lastName: lastName,
-          email: email,
+          mobileNumber: mobileNumber,
       });
 
       // After successful registration, navigate to the login page,
@@ -52,7 +52,7 @@ export default function OtpVerificationPage() {
       const query = new URLSearchParams({
           firstName: firstName,
           lastName: lastName,
-          email: email,
+          mobileNumber: mobileNumber,
       }).toString();
 
       router.push(`/login?${query}`);
@@ -72,7 +72,7 @@ export default function OtpVerificationPage() {
         <CardHeader>
           <CardTitle className="text-2xl">OTP Verification</CardTitle>
           <CardDescription>
-            Enter the 6-digit code sent to your email.
+            Enter the 6-digit code sent to your mobile number.
           </CardDescription>
         </CardHeader>
         <CardContent>

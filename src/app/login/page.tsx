@@ -8,21 +8,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { setLoggedInUserByEmail, clearLoggedInUser, userExists } from '@/lib/data';
+import { setLoggedInUserByIdentifier, clearLoggedInUser, userExists } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
 
-  // Pre-fill email from registration if available
+  // Pre-fill mobile number from registration if available
   useEffect(() => {
-    const emailFromReg = searchParams.get('email');
-    if (emailFromReg) {
-      setEmail(emailFromReg);
+    const mobileFromReg = searchParams.get('mobileNumber');
+    if (mobileFromReg) {
+      setMobileNumber(mobileFromReg);
     }
     // Clear any previously simulated logged-in user on component mount
     clearLoggedInUser();
@@ -33,8 +33,8 @@ export default function LoginPage() {
     
     // In a real app, you'd handle authentication here.
     // For this simulation, we'll check if the user exists.
-    if (userExists(email)) {
-      setLoggedInUserByEmail(email);
+    if (userExists(mobileNumber)) {
+      setLoggedInUserByIdentifier(mobileNumber);
       router.push('/profile');
     } else {
       // If not coming from a fresh registration, it's an unknown user.
@@ -42,12 +42,12 @@ export default function LoginPage() {
         toast({
             variant: 'destructive',
             title: 'Login Failed',
-            description: 'No account found with that email. Please sign up.',
+            description: 'No account found with that mobile number. Please sign up.',
         });
       } else {
         // This case handles the flow immediately after registration,
         // where the user is guaranteed to exist from the previous step.
-        setLoggedInUserByEmail(email);
+        setLoggedInUserByIdentifier(mobileNumber);
         router.push('/profile');
       }
     }
@@ -59,20 +59,20 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your mobile number below to login to your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="mobileNumber">Mobile Number</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
+                id="mobileNumber"
+                type="tel"
+                placeholder="+1234567890"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
               />
             </div>
             <div className="grid gap-2">

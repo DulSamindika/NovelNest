@@ -86,14 +86,14 @@ const allUsers: User[] = [
 ];
 
 // --- Auth Simulation ---
-export function addUser(userData: { firstName: string, lastName: string, email: string }) {
+export function addUser(userData: { firstName: string, lastName: string, mobileNumber: string }) {
     const newUser: User = {
         uid: `user-${Date.now()}`,
         firstName: userData.firstName,
         lastName: userData.lastName,
         username: `${userData.firstName.toLowerCase()}${userData.lastName.toLowerCase()}`,
-        contactInfo: userData.email,
-        mobileNumber: 'Not provided',
+        mobileNumber: userData.mobileNumber,
+        contactInfo: 'Not provided', // Email is no longer the primary identifier
         address: 'Not provided',
         profilePicUrl: `https://picsum.photos/seed/${Date.now()}/100/100`, // Default pic
         ratings: [],
@@ -101,29 +101,27 @@ export function addUser(userData: { firstName: string, lastName: string, email: 
     allUsers.push(newUser);
 }
 
-export function userExists(email: string): boolean {
-    return allUsers.some(user => user.contactInfo === email);
+export function userExists(identifier: string): boolean {
+    return allUsers.some(user => user.mobileNumber === identifier || user.contactInfo === identifier);
 }
 
-export function setLoggedInUserByEmail(email: string) {
-    const user = allUsers.find(u => u.contactInfo === email);
+export function setLoggedInUserByIdentifier(identifier: string) {
+    const user = allUsers.find(u => u.mobileNumber === identifier || u.contactInfo === identifier);
     if (user) {
         LOGGED_IN_USER_ID = user.uid;
     } else {
-        // Fallback to default user if email not found, though logic should prevent this.
+        // Fallback to default user if identifier not found, though logic should prevent this.
         LOGGED_IN_USER_ID = 'user-123';
     }
 }
 
 export function setLoggedInUser(user?: User) {
     if (user) {
-        // This is now primarily for the old login flow which we're phasing out
         if (!allUsers.find(u => u.uid === user.uid)) {
             allUsers.push(user);
         }
         LOGGED_IN_USER_ID = user.uid;
     } else {
-        // This simulates logging in as the default user
         LOGGED_IN_USER_ID = 'user-123';
     }
 }

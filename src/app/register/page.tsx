@@ -17,7 +17,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
+    mobileNumber: '',
     password: '',
   });
 
@@ -30,11 +30,11 @@ export default function RegisterPage() {
     e.preventDefault();
     
     // Check if user already exists
-    if (userExists(formData.email)) {
+    if (userExists(formData.mobileNumber)) {
         toast({
             variant: 'destructive',
             title: 'Registration Failed',
-            description: 'An account with this email already exists.',
+            description: 'An account with this mobile number already exists.',
         });
         return;
     }
@@ -44,7 +44,7 @@ export default function RegisterPage() {
     const query = new URLSearchParams({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email
+        mobileNumber: formData.mobileNumber
     }).toString();
 
     router.push(`/otp-verification?${query}`);
@@ -72,14 +72,14 @@ export default function RegisterPage() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="mobileNumber">Mobile Number</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
+                id="mobileNumber"
+                type="tel"
+                placeholder="+1234567890"
                 required
                 onChange={handleChange}
-                value={formData.email}
+                value={formData.mobileNumber}
               />
             </div>
             <div className="grid gap-2">
