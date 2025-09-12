@@ -154,7 +154,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 13.5,
     sellerId: 'user-456',
     sellerName: 'John Smith',
-    sellerContact: '555-1234',
+    sellerContact: '+19876543210',
     bookImageUrls: [
         'https://picsum.photos/seed/book1/400/600',
         'https://picsum.photos/seed/book1-2/400/600',
@@ -172,7 +172,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 20.0,
     sellerId: 'user-789',
     sellerName: 'Emily Jones',
-    sellerContact: 'emily@email.com',
+    sellerContact: '+15551239876',
     bookImageUrls: [
         'https://picsum.photos/seed/book2/400/600',
         'https://picsum.photos/seed/book2-2/400/600',
@@ -189,7 +189,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 8.0,
     sellerId: 'user-101',
     sellerName: 'Michael Brown',
-    sellerContact: 'Call 555-5678',
+    sellerContact: '+15558887777',
     bookImageUrls: ['https://picsum.photos/seed/book3/400/600'],
   },
   {
@@ -203,7 +203,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 15.0,
     sellerId: 'user-456',
     sellerName: 'John Smith',
-    sellerContact: '555-1234',
+    sellerContact: '+19876543210',
     bookImageUrls: [
         'https://picsum.photos/seed/book4/400/600',
         'https://picsum.photos/seed/book4-2/400/600',
@@ -220,7 +220,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 12.0,
     sellerId: 'user-112',
     sellerName: 'Sarah Davis',
-    sellerContact: 'sarah.d@web.com',
+    sellerContact: '+15552223333',
     bookImageUrls: ['https://picsum.photos/seed/book5/400/600'],
   },
   {
@@ -234,7 +234,7 @@ const booksData: Omit<Book, 'seller'>[] = [
     sellingPrice: 10.0,
     sellerId: 'user-789',
     sellerName: 'Emily Jones',
-    sellerContact: 'emily@email.com',
+    sellerContact: '+15551239876',
     bookImageUrls: [
         'https://picsum.photos/seed/book6/400/600',
         'https://picsum.photos/seed/book6-2/400/600',

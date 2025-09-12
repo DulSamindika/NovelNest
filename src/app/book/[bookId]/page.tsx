@@ -45,6 +45,9 @@ export default function BookDetailPage() {
   const averageRating = book.seller.ratings.length > 0
   ? (book.seller.ratings.reduce((acc, r) => acc + r.rating, 0) / book.seller.ratings.length).toFixed(1)
   : 'N/A';
+  
+  const cleanPhoneNumber = book.sellerContact.replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanPhoneNumber}`;
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -117,9 +120,11 @@ export default function BookDetailPage() {
                 </Link>
               </div>
 
-              <Button size="lg" className="mt-auto">
-                <Phone className="mr-2" />
-                Contact Seller ({book.sellerContact})
+              <Button size="lg" className="mt-auto" asChild>
+                 <Link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                    <Phone className="mr-2" />
+                    Contact Seller ({book.sellerContact})
+                </Link>
               </Button>
             </div>
           </div>
