@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { addUser, userExists } from '@/lib/data';
+import { userExists } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
 export default function RegisterPage() {
@@ -39,22 +39,15 @@ export default function RegisterPage() {
         return;
     }
 
-    // Add the new user to our simulated database
-    addUser({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-    });
-
-    // After successful registration, navigate to the login page,
-    // passing the new user's data in the query params for simulation.
+    // In a real app, you would now trigger sending an OTP.
+    // Here, we'll just redirect to the OTP page with the user's data.
     const query = new URLSearchParams({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email
     }).toString();
 
-    router.push(`/login?${query}`);
+    router.push(`/otp-verification?${query}`);
   };
 
   return (
