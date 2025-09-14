@@ -1,61 +1,110 @@
-
+// src/app/profile/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getLoggedInUser } from '@/lib/data';
-import type { User, Rating } from '@/lib/types';
-import { Mail, Phone, Home as HomeIcon, Star } from 'lucide-react';
-import Header from '@/components/site/header';
-import { Separator } from '@/components/ui/separator';
-import BookList from '@/components/site/book-list';
-import AddBookDialog from '@/components/site/add-book-dialog';
-import EditProfileDialog from '@/components/site/edit-profile-dialog';
-import { useBooks } from '@/context/book-context';
-import RateSellerDialog from '@/components/site/rate-seller-dialog';
+import { useEffect, useMemo, useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getLoggedInUser } from "@/lib/data";
+import type { User, Rating } from "@/lib/types";
+import { Mail, Phone, Home as HomeIcon, Star } from "lucide-react";
+import Header from "@/components/site/header";
+import { Separator } from "@/components/ui/separator";
+import BookList from "@/components/site/book-list";
+import AddBookDialog from "@/components/site/add-book-dialog";
+import EditProfileDialog from "@/components/site/edit-profile-dialog";
+import { useBooks } from "@/context/book-context";
+import RateSellerDialog from "@/components/site/rate-seller-dialog";
+
+// ✅ Server action (Admin SDK) – avoids browser Firestore/CORS issues
+import { getProfileAction } from "../ideamart-actions";
+
+// Keep the same normalization you use everywhere else
+function toE164LK(msisdn: string) {
+  const s = (msisdn || "").replace(/\s+/g, "");
+  if (s.startsWith("+94")) return s;
+  if (s.startsWith("94")) return `+${s}`;
+  if (/^0\d{9}$/.test(s)) return `+94${s.slice(1)}`;
+  return s;
+}
+
+// Read the demo session set by your login flow: localStorage.demo_user.mobileNumber
+function getSessionMobile(): string | null {
+  try {
+    const raw = localStorage.getItem("demo_user");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const m = (parsed?.mobileNumber as string) || "";
+    return m.trim() || null;
+  } catch {
+    return null;
+  }
+}
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const { books, toggleFavorite, addBook } = useBooks();
-  
+
+  // 1) Hydrate base (dummy/local) user
   useEffect(() => {
     setUser(getLoggedInUser());
   }, []);
 
+  // 2) Decide which phone to query by, then normalize (+94…)
+  const resolvedMsisdn = useMemo(() => {
+    const fromSession = getSessionMobile();
+    const fallback = user?.mobileNumber || "";
+    const picked = (fromSession || fallback || "").trim();
+    return toE164LK(picked);
+  }, [user?.mobileNumber]);
+
+  // 3) Fetch minimal profile via server action and merge
+  useEffect(() => {
+    if (!resolvedMsisdn) return;
+
+    (async () => {
+      try {
+        const res = await getProfileAction(resolvedMsisdn);
+        if (!res.ok) return; // keep dummy on not found
+
+        setUser(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            firstName: res.user.firstName || prev.firstName,
+            lastName: res.user.lastName || prev.lastName,
+            mobileNumber: res.user.mobileNumber || resolvedMsisdn,
+          };
+        });
+      } catch (e) {
+        console.error("Profile fetch failed:", e);
+        // keep dummy values silently on error
+      }
+    })();
+  }, [resolvedMsisdn]);
+
   const handleProfileUpdate = (updatedUser: Partial<User>) => {
-    if (user) {
-      setUser(prevUser => ({ ...prevUser!, ...updatedUser }));
-      // In a real app, you would also update this in your database.
-    }
-  };
-  
-  const handleAddRating = (newRating: Omit<Rating, 'id' | 'customerId'>) => {
-    if (user) {
-      setUser(prevUser => ({
-        ...prevUser!,
-        ratings: [
-          { 
-            ...newRating, 
-            id: `rating-${Date.now()}`,
-            customerId: `customer-${Date.now()}` // Simulate a unique customer
-          }, 
-          ...prevUser!.ratings
-        ],
-      }));
-       // In a real app, you would also update this in your database.
-    }
+    if (user) setUser(prev => ({ ...prev!, ...updatedUser }));
   };
 
-  if (!user) {
-    return <div>Loading...</div>; // Or a skeleton loader
-  }
+  const handleAddRating = (newRating: Omit<Rating, "id" | "customerId">) => {
+    if (!user) return;
+    setUser(prev => ({
+      ...prev!,
+      ratings: [
+        { ...newRating, id: `rating-${Date.now()}`, customerId: `customer-${Date.now()}` },
+        ...prev!.ratings,
+      ],
+    }));
+  };
 
-  const userBooks = books.filter(book => book.sellerId === user.uid);
-  const favoriteBooks = books.filter(book => book.isFavorite);
-  const averageRating = user.ratings.length > 0
-    ? (user.ratings.reduce((acc, r) => acc + r.rating, 0) / user.ratings.length).toFixed(1)
-    : 'N/A';
+  if (!user) return <div className="p-6">Loading...</div>;
+
+  const userBooks = books.filter(b => b.sellerId === user.uid);
+  const favoriteBooks = books.filter(b => b.isFavorite);
+  const averageRating =
+    user.ratings.length > 0
+      ? (user.ratings.reduce((acc, r) => acc + r.rating, 0) / user.ratings.length).toFixed(1)
+      : "N/A";
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -67,14 +116,18 @@ export default function ProfilePage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={user.profilePicUrl} alt={`${user.firstName} ${user.lastName}`} />
-                  <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{user.firstName?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold font-headline">{user.firstName} {user.lastName}</h1>
+                  <h1 className="text-3xl font-bold font-headline">
+                    {user.firstName} {user.lastName}
+                  </h1>
                   <p className="text-muted-foreground">@{user.username}</p>
                   <div className="mt-2 flex items-center gap-2 text-sm text-yellow-500">
                     <Star className="h-5 w-5 fill-current" />
-                    <span>{averageRating} ({user.ratings.length} ratings)</span>
+                    <span>
+                      {averageRating} ({user.ratings.length} ratings)
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2 self-start sm:self-auto">
@@ -112,7 +165,7 @@ export default function ProfilePage() {
           </div>
 
           <Separator className="my-8" />
-          
+
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Your Books for Sale</h2>
             {userBooks.length > 0 ? (
@@ -121,9 +174,9 @@ export default function ProfilePage() {
               <p className="text-muted-foreground">You haven't listed any books for sale yet.</p>
             )}
           </div>
-          
+
           <Separator className="my-8" />
-          
+
           <div>
             <h2 className="text-2xl font-bold mb-4">Feedback & Ratings</h2>
             <div className="space-y-6">
@@ -133,7 +186,10 @@ export default function ProfilePage() {
                     <div className="flex items-center mb-2">
                       <div className="flex items-center gap-1 text-yellow-500">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`h-4 w-4 ${i < rating.rating ? 'fill-current' : 'text-gray-300'}`} />
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${i < rating.rating ? "fill-current" : "text-gray-300"}`}
+                          />
                         ))}
                       </div>
                       <p className="ml-auto text-xs text-muted-foreground">by {rating.customerName}</p>

@@ -1,56 +1,59 @@
-
+// src/app/login/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import Link from 'next/link';
-import { setLoggedInUserByIdentifier, clearLoggedInUser, userExists } from '@/lib/data';
-import { useToast } from '@/hooks/use-toast';
-import Header from '@/components/site/header';
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import Header from "@/components/site/header";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading…</div>}>
+      <LoginInner />
+    </Suspense>
+  );
+}
+
+function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [password, setPassword] = useState('');
 
-  // Pre-fill mobile number from registration if available
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
-    const mobileFromReg = searchParams.get('mobileNumber');
-    if (mobileFromReg) {
-      setMobileNumber(mobileFromReg);
-    }
-    // Clear any previously simulated logged-in user on component mount
-    clearLoggedInUser();
+    const mobileFromReg = searchParams.get("mobileNumber");
+    if (mobileFromReg) setMobileNumber(mobileFromReg);
+    try { localStorage.removeItem("demo_user"); } catch {}
   }, [searchParams]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // In a real app, you'd handle authentication here.
-    // For this simulation, we'll check if the user exists.
-    if (userExists(mobileNumber)) {
-      setLoggedInUserByIdentifier(mobileNumber);
-      router.push('/profile');
-    } else {
-      // If not coming from a fresh registration, it's an unknown user.
-      if (!searchParams.get('firstName')) {
-        toast({
-            variant: 'destructive',
-            title: 'Login Failed',
-            description: 'No account found with that mobile number. Please sign up.',
-        });
-      } else {
-        // This case handles the flow immediately after registration,
-        // where the user is guaranteed to exist from the previous step.
-        setLoggedInUserByIdentifier(mobileNumber);
-        router.push('/profile');
+    setIsLoading(true);
+    try {
+      const { loginCheckAction } = await import("../ideamart-actions");
+      const res = await loginCheckAction(mobileNumber, password);
+      if (!res.ok) {
+        toast({ variant: "destructive", title: "Login failed", description: res.error || "Try again." });
+        return;
       }
+
+      try {
+        localStorage.setItem("demo_user", JSON.stringify(res.user));
+      } catch {}
+
+      router.push("/profile");
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Login error", description: err?.message || "Please try again." });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,42 +64,24 @@ export default function LoginPage() {
         <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>
-              Enter your mobile number below to login to your account.
-            </CardDescription>
+            <CardDescription>Enter your mobile number below to login to your account.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="mobileNumber">Mobile Number</Label>
-                <Input
-                  id="mobileNumber"
-                  type="tel"
-                  placeholder="+1234567890"
-                  required
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                />
+                <Input id="mobileNumber" type="tel" placeholder="+94XXXXXXXXX" required value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} disabled={isLoading} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
               </div>
-              <Button type="submit" className="w-full">
-                Sign in
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="underline">
-                Sign up
-              </Link>
+              Don&apos;t have an account? <Link href="/register" className="underline">Sign up</Link>
             </div>
           </CardContent>
         </Card>
